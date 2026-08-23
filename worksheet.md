@@ -38,22 +38,16 @@ Every section after this one changes how Claude works. This one changes nothing 
 `ccusage` reads Claude Code's own logs and turns them into a bill: daily spend, per-session, and 5-hour billing blocks.
 
 ```bash
-npx ccusage@latest daily
-npx ccusage@latest blocks
+npx ccusage claude daily -s 20260801
 ```
 
-<!-- VERIFY: exact ccusage subcommands and package name -->
-
-1. Run it now, before anything else in this workshop touches your usage.
-2. Write the number down, today's spend or your last session's, somewhere you'll see it again at the end of the day. That's your baseline.
-
-Everything from here either moves that number or it doesn't.
+Get a gist of your usage
 
 **Checkpoint:** `ccusage` runs, and you have a before number written down somewhere.
 
 ## rtk
 
-A huge share of the tokens in a session aren't the model thinking. They're `git status`, `npm test`, `ls -la`, and every command's raw stdout getting fed back into context, whether you needed all of it or not.
+A huge share of the tokens in a session aren't the model thinking. They're command's outputs. [Install RTK](https://github.com/rtk-ai/rtk#installation)
 
 `rtk` (Rust Token Killer) is a CLI proxy that filters that output down to what's actually useful before it enters context. 60-90% savings on the commands it wraps.
 
@@ -79,50 +73,27 @@ In normal use you never type `rtk` yourself. A Claude Code hook rewrites the com
 ```bash
 rtk proxy git status
 ```
-
-<!-- VERIFY: exact hook mechanism / how the rewrite is wired up -->
-
-> There's another tool called `rtk` on some systems (`reachingforthejack/rtk`, Rust Type Kit, unrelated). If `rtk gain` errors out with something that doesn't look like a savings report, that's the collision. Check `which rtk`.
-
 **Checkpoint:** `rtk gain` runs and shows a number. You've run `rtk discover` at least once and seen what it flagged.
 
 ## Headroom
 
-Quality degrades before you hit the context limit, not at it. Keep headroom: know what's loaded, clear it at the right moment, undo forward rather than patch around a mistake.
+> Headroom is the context optimization layer for LLM applications. Compress tool outputs, DB results, file reads, and RAG results before they reach the model. Same answers, fraction of the tokens.
 
-```
-/context
-```
-
-What's actually sitting in the window right now, not what you think is there.
-
-```
-/compact
-```
-
-Compress at a task boundary, when the unit of work is done and committed, not mid-task. Mid-task, it can compress away the exact detail you need three turns from now.
-
-`Esc Esc` rewinds to an earlier point. Cheaper than talking your way out of a turn that went sideways: untangling forward pays for the mistake and the fix, rewinding just pays for the fix.
-
-<!-- VERIFY: exact behavior/scope of Esc Esc rewind, and whether there's a more specific headroom-management command or practice beyond /context, /compact, Esc Esc -->
-
-**Checkpoint:** you've run `/context` on a real session and can say, roughly, what's taking up the space.
+https://docs.headroomlabs.ai/docs/quickstart
 
 ## Caveman mode
 
-Verbose model output is not free. Every paragraph of "I'll now proceed to..." and "Great question! Let's break this down..." is output tokens you paid for and probably didn't read past the first line of.
+https://github.com/juliusbrussee/caveman
 
-The practice is a terse mode: strip the narration, keep the substance. Code first, decisions stated flat, no preamble and no wrap-up unless asked for one. On a long session this is a real, measurable saving, not a stylistic preference.
+While headroom compresses output, cavemen compress the input passed on to the models, thereby saving tokens
 
-<!-- VERIFY: exact invocation for caveman mode (slash command / CLAUDE.md instruction / other) -->
 
-**Checkpoint:** you've tried at least one exchange in terse mode and can point to the difference in the reply.
 
-## Your notes
+## Notes
 
-- What was your `ccusage` number before this segment? What is it after today's session?
-- Which command did `rtk discover` flag that surprised you?
-- One habit from this segment you're actually going to keep doing tomorrow:
+- Not everyone likes these tools. Some find it useful, some don't
+- Use your own judgement and adopt what works for you
+- Experiment.
 
 ---
 
@@ -868,6 +839,10 @@ git worktree list
 Should show only your main checkout. A stray worktree means the loop stopped somewhere and told you why.
 
 **Checkpoint:** a working expense splitter that settles up correctly, and a clean worktree list.
+
+### Note:
+
+- For a small project like this, it's best we work through each issue in a single session rather than multiple sub-agents, we did that only to understand the concepts
 
 
 ## Agentic OS
