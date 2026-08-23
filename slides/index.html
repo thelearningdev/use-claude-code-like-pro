@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Use Claude Code Like a Pro — Bhavani Ravi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c0b09; --surface:#141210; --surface-2:#1e1b16; --border:#2a2720;
+  --text:#f2ede4; --muted:#c8c0b8; --subtle:#8a8278;
+  --accent:#e8441a; --accent-h:#ff6040; --gold:#c9963e; --green:#5a9872;
+  --font-display:'Outfit',system-ui,sans-serif;
+  --font-body:'Outfit',system-ui,sans-serif;
+  --font-mono:'Space Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--bg); color:var(--text); font-family:var(--font-body);
+  font-weight:400; line-height:1.7; -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* ─── Deck mechanics ─────────────────────────── */
+.slide{
+  position:fixed; inset:0; display:none;
+  padding:clamp(2rem,5vh,4rem) clamp(1.5rem,6vw,6rem);
+  overflow:auto;
+}
+.slide.active{display:flex; flex-direction:column; justify-content:center}
+.inner{width:100%; max-width:1160px; margin:0 auto}
+
+/* ─── Typography ─────────────────────────────── */
+.display{font-family:var(--font-display); font-weight:600; line-height:1.08; letter-spacing:-0.03em}
+.display-xl{font-size:clamp(2.6rem,6.5vw,5.5rem)}
+.display-lg{font-size:clamp(2rem,4.2vw,3.4rem)}
+.display-md{font-size:clamp(1.5rem,2.6vw,2.2rem)}
+.display-hero{font-size:clamp(3.5rem,11vw,9rem); line-height:.95; color:var(--accent)}
+.hl{color:var(--accent)}
+.label{font-size:clamp(.75rem,.9vw,.9rem); font-weight:500; letter-spacing:.16em; text-transform:uppercase; color:var(--muted)}
+.label-accent{color:var(--accent)}
+.lede{font-size:clamp(1.05rem,1.4vw,1.4rem); line-height:1.6; color:var(--muted); max-width:52ch}
+.accent-bar{display:inline-block; width:2.5rem; height:3px; background:var(--accent); border-radius:2px}
+em.it{font-style:normal; font-weight:600; color:var(--accent)}
+strong{font-weight:600; color:var(--text)}
+
+.stack>*+*{margin-top:1.5rem}
+.stack-sm>*+*{margin-top:.85rem}
+
+/* ─── Cards & grids ──────────────────────────── */
+.card{background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:clamp(1.25rem,2vw,2rem)}
+.grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(1rem,1.6vw,1.75rem)}
+.grid-2{display:grid; grid-template-columns:1.1fr .9fr; gap:clamp(1.5rem,4vw,4rem); align-items:center}
+.card .axis-n{font-size:.8rem; font-weight:500; color:var(--accent); letter-spacing:.2em}
+.axis-h{font-family:var(--font-display); font-weight:600; font-size:clamp(1.25rem,1.9vw,1.7rem); letter-spacing:-0.02em; line-height:1.15; margin:.4rem 0 .6rem}
+.card p{font-size:clamp(.9rem,1.1vw,1.08rem); color:var(--muted); line-height:1.5}
+.card .tools{margin-top:1rem; font-family:var(--font-mono); font-size:.78rem; color:var(--subtle); line-height:1.9}
+.card .tools span{display:inline-block; border:1px solid var(--border); border-radius:3px; padding:.1rem .5rem; margin:0 .3rem .3rem 0; background:var(--surface-2)}
+
+/* ─── Table ──────────────────────────────────── */
+table{width:100%; border-collapse:collapse; font-size:clamp(.78rem,1vw,1rem)}
+th,td{text-align:left; padding:.55rem .75rem; border-bottom:1px solid var(--border); vertical-align:top}
+thead th{font-size:clamp(.65rem,.8vw,.8rem); letter-spacing:.12em; text-transform:uppercase; color:var(--subtle); font-weight:500}
+tbody td:first-child{color:var(--text); font-weight:500}
+td{color:var(--muted)}
+.yes{color:var(--green)}
+.part{color:var(--gold)}
+.no{color:var(--subtle)}
+.tbl-wrap{overflow-x:auto}
+caption{caption-side:bottom; text-align:left; padding-top:1rem; font-size:.88rem; color:var(--subtle)}
+
+/* ─── Photo ──────────────────────────────────── */
+.portrait{
+  width:100%; aspect-ratio:4/5; object-fit:cover; border-radius:8px;
+  border:1px solid var(--border); background:var(--surface-2);
+  display:block;
+}
+.portrait-ph{
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-mono); font-size:.8rem; color:var(--subtle); text-align:center; padding:2rem;
+}
+
+/* ─── Quote ──────────────────────────────────── */
+blockquote.editorial{
+  font-family:var(--font-display); font-size:clamp(1.5rem,3.2vw,2.6rem);
+  font-weight:300; line-height:1.35; letter-spacing:-0.02em; color:var(--text);
+  border-left:3px solid var(--accent); padding-left:1.5rem;
+}
+
+/* ─── Chrome ─────────────────────────────────── */
+.chrome{
+  position:fixed; left:0; right:0; bottom:0;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:.9rem clamp(1.5rem,6vw,6rem);
+  font-size:.72rem; font-weight:500; letter-spacing:.14em;
+  color:var(--subtle); text-transform:uppercase; pointer-events:none;
+}
+.progress{position:fixed; top:0; left:0; height:2px; background:var(--accent); width:0; transition:width .3s ease}
+.hint{opacity:.5}
+
+/* ─── Reveal ─────────────────────────────────── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.slide.active .reveal{opacity:0; animation:fadeUp .45s cubic-bezier(.22,1,.36,1) forwards}
+.reveal-1{animation-delay:.03s}.reveal-2{animation-delay:.09s}.reveal-3{animation-delay:.15s}
+.reveal-4{animation-delay:.21s}.reveal-5{animation-delay:.27s}
+
+/* ─── Fragments: reveal on click, not on slide entry ─── */
+.frag{opacity:0; transform:translateY(14px); transition:opacity .35s cubic-bezier(.22,1,.36,1), transform .35s cubic-bezier(.22,1,.36,1)}
+.frag.on{opacity:1; transform:none}
+
+@media (max-width:820px){
+  .grid-3,.grid-2{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  .slide.active .reveal{opacity:1; animation:none}
+  .frag{transition:none}
+}
+@media print{
+  body{overflow:visible}
+  .slide{display:flex !important; position:relative; page-break-after:always; min-height:100vh}
+  .chrome,.progress{display:none}
+  .frag{opacity:1; transform:none}
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<!-- 0 ─ Title ───────────────────────────────── -->
+<section class="slide">
+  <div class="inner stack">
+    <h1 class="display display-xl reveal reveal-2">Use Claude Code<br>like a <em class="it">pro</em></h1>
+    <div class="reveal reveal-3"><span class="accent-bar"></span></div>
+    <p class="lede reveal reveal-4">Bhavani Ravi</p>
+  </div>
+</section>
+
+<!-- 1 ─ About me ─────────────────────────────── -->
+<section class="slide">
+  <div class="inner grid-2">
+    <div class="stack">
+      <h2 class="display display-lg reveal reveal-2">Bhavani Ravi</h2>
+      <div class="reveal reveal-3"><span class="accent-bar"></span></div>
+      <div class="stack-sm reveal reveal-4">
+        <p class="lede">Engineer, teacher, and founder of <strong>flowexperts.ai</strong> — we build and ship AI agent systems for teams that need them working in production, not in a demo.</p>
+        <p class="lede">I spend my days inside coding agents. This workshop is what I'd tell a colleague on day one.</p>
+      </div>
+      <p class="label reveal reveal-5">flowexperts.ai · @bhavaniravi</p>
+    </div>
+    <div class="reveal reveal-3">
+      <!-- TODO: drop the IIMB photo in as slides/iimb.jpg, or change the src below -->
+      <img class="portrait" src="iimb.jpg" alt="Bhavani Ravi speaking at IIM Bangalore"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+      <div class="portrait portrait-ph" style="display:none">TODO — IIMB photo<br>slides/iimb.jpg</div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 ─ ROI ──────────────────────────────────── -->
+<section class="slide">
+  <div class="inner stack">
+    <h2 class="display display-hero reveal reveal-2">ROI</h2>
+  </div>
+</section>
+
+<!-- 3 ─ ROI in 3 axes ────────────────────────── -->
+<section class="slide">
+  <div class="inner stack">
+    <h2 class="display display-lg hl reveal reveal-2">ROI</h2>
+    <div class="grid-3">
+      <div class="card frag">
+        <p class="axis-n">01</p>
+        <h3 class="axis-h">Token usage</h3>
+        <p>What does one task actually cost you? Most people have never looked. You can't cut what you haven't measured.</p>
+        <p class="tools"><span>ccusage</span><span>rtk gain</span><span>rtk discover</span><span>headroom</span><span>caveman</span></p>
+      </div>
+      <div class="card frag">
+        <p class="axis-n">02</p>
+        <h3 class="axis-h">Quality &amp; consistency</h3>
+        <p>Does the tenth task look like the first? Consistency comes from structure the agent can't drift out of — not from a longer prompt.</p>
+        <p class="tools"><span>spec-driven</span><span>rules</span><span>subagents</span><span>hooks</span><span>MCP</span></p>
+      </div>
+      <div class="card frag">
+        <p class="axis-n">03</p>
+        <h3 class="axis-h">Autonomy &amp; reproducibility</h3>
+        <p>Can it run without you in the chair, and land the same way twice? The gates have to sit where the agent can't reach them.</p>
+        <p class="tools"><span>worktrees</span><span>/task</span><span>/loop</span><span>mobile</span><span>self-healing PR</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 ─ Pro = levers ─────────────────────────── -->
+<section class="slide">
+  <div class="inner stack">
+    <h2 class="display display-xl reveal reveal-2">Using Claude Code<br>like a <span class="hl">&ldquo;pro&rdquo;</span></h2>
+    <div class="reveal reveal-3"><span class="accent-bar"></span></div>
+    <h2 class="display display-md reveal reveal-4">It's the art of pulling the levers of ROI.</h2>
+  </div>
+</section>
+
+<!-- 5 ─ Feature parity ───────────────────────── -->
+<section class="slide">
+  <div class="inner stack">
+    <div class="tbl-wrap reveal reveal-3">
+      <table>
+        <thead>
+          <tr><th>Lever</th><th>Claude Code</th><th>Cursor</th><th>Codex CLI</th><th>Gemini CLI</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Project context</td><td class="yes">CLAUDE.md</td><td class="yes">.cursor/rules</td><td class="yes">AGENTS.md</td><td class="yes">GEMINI.md</td></tr>
+          <tr><td>Path-scoped rules</td><td class="yes">.claude/rules · paths:</td><td class="yes">glob globs</td><td class="part">nested AGENTS.md</td><td class="part">nested files</td></tr>
+          <tr><td>Subagents</td><td class="yes">.claude/agents</td><td class="part">background agents</td><td class="part">limited</td><td class="part">limited</td></tr>
+          <tr><td>Commands</td><td class="yes">/commands</td><td class="yes">commands</td><td class="yes">prompts</td><td class="yes">custom commands</td></tr>
+          <tr><td>Skills</td><td class="yes">.claude/skills · auto-loaded</td><td class="no">❌</td><td class="no">❌</td><td class="no">❌</td></tr>
+          <tr><td>Plugins</td><td class="yes">marketplaces · bundles all of the above</td><td class="part">extensions</td><td class="no">❌</td><td class="part">extensions</td></tr>
+          <tr><td>Hooks</td><td class="yes">Pre/Post/Stop</td><td class="part">limited</td><td class="part">limited</td><td class="yes">hooks</td></tr>
+          <tr><td>MCP servers</td><td class="yes">yes</td><td class="yes">yes</td><td class="yes">yes</td><td class="yes">yes</td></tr>
+          <tr><td>Unattended runs</td><td class="yes">headless · -p</td><td class="yes">background</td><td class="yes">exec</td><td class="part">limited</td></tr>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 6 ─ Hands-on handoff ─────────────────────── -->
+<section class="slide">
+  <div class="inner stack">
+    <h2 class="display display-hero reveal reveal-2">Hands-On</h2>
+  </div>
+</section>
+
+<!-- 7 ─ Close ────────────────────────────────── -->
+<section class="slide">
+  <div class="inner stack">
+    <blockquote class="editorial reveal reveal-2">ADLC is the process the agents follow. The Agentic OS is the machine that runs it. Claude Code is what both are built from.</blockquote>
+    <p class="lede reveal reveal-3">Neither is a feature you switch on. Both are things you build — and yours is in <strong>.claude/</strong> by the end of today.</p>
+    <p class="label reveal reveal-4">Bhavani Ravi &nbsp;·&nbsp; flowexperts.ai</p>
+  </div>
+</section>
+
+<div class="chrome">
+  <span id="deck-label">Use Claude Code Like a Pro</span>
+  <span class="hint">← → navigate</span>
+  <span id="counter">1 / 8</span>
+</div>
+
+<script>
+const slides = [...document.querySelectorAll('.slide')];
+let i = 0;
+
+// Fragments advance within a slide before the deck moves to the next one.
+const frags = s => [...s.querySelectorAll('.frag')];
+
+function show(n, fragsShown){
+  i = Math.max(0, Math.min(slides.length - 1, n));
+  slides.forEach((s, k) => {
+    s.classList.toggle('active', k === i);
+    // -1 means "all of them", used when arriving at a slide backwards.
+    const upto = k === i ? (fragsShown === -1 ? Infinity : fragsShown || 0) : 0;
+    frags(s).forEach((f, j) => f.classList.toggle('on', j < upto));
+  });
+  document.getElementById('counter').textContent = `${i + 1} / ${slides.length}`;
+  document.getElementById('progress').style.width = ((i + 1) / slides.length * 100) + '%';
+  location.hash = i ? i + 1 : '';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); next(); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
+  else if (e.key === 'Home') show(0);
+  else if (e.key === 'End') show(slides.length - 1, -1);
+});
+
+// Tap right half to advance, left half to go back — for presenting from a tablet.
+document.addEventListener('click', e => {
+  if (e.target.closest('a')) return;
+  e.clientX > window.innerWidth / 2 ? next() : prev();
+});
+
+function next(){
+  const f = frags(slides[i]);
+  const shown = f.filter(x => x.classList.contains('on')).length;
+  if (shown < f.length) { f[shown].classList.add('on'); return; }
+  show(i + 1);
+}
+
+function prev(){
+  const f = frags(slides[i]);
+  const shown = f.filter(x => x.classList.contains('on')).length;
+  if (shown > 0) { f[shown - 1].classList.remove('on'); return; }
+  show(i - 1, -1);
+}
+
+show(parseInt(location.hash.slice(1), 10) - 1 || 0);
+</script>
+</body>
+</html>
