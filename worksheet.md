@@ -139,15 +139,15 @@ Integer cents matters most. Nobody says it in a casual brief and no agent reliab
 5. Write the spec, and read every line of it.
 
 ```
-Write all of that to _docs/spec.md. Include a section on what is
+Write all of that to plans/spec.md. Include a section on what is
 explicitly out of scope for version one.
 ```
 
 ```bash
-git add _docs/spec.md && git commit -m "Add spec"
+git add plans/spec.md && git commit -m "Add spec"
 ```
 
-**Checkpoint:** `_docs/spec.md` exists and you have read every line of it.
+**Checkpoint:** `plans/spec.md` exists and you have read every line of it.
 
 ## Backlog of Tasks
 
@@ -160,7 +160,7 @@ Capture that now, because in an hour it becomes the difference between working t
 Still in plan mode:
 
 ```md
-Read _docs/spec.md and create _docs/backlog.md with numbered tasks.
+Read plans/spec.md and create plans/backlog.md with numbered tasks.
 
 Each task small enough to finish in one sitting.
 
@@ -228,7 +228,7 @@ Every dependency you remove is a task that can run in parallel later. Commit whe
 Leave plan mode:
 
 ```
-Implement task 1 from _docs/backlog.md. Do TDD. Use uv and pytest.
+Implement task 1 from plans/backlog.md. Do TDD. Use uv and pytest.
 ```
 
 **Checkpoint:** a skeleton with a passing test, and a backlog where at least two tasks depend on nothing but each other's layer.
@@ -312,6 +312,8 @@ A subagent has its own system prompt, its own isolated context, and its own list
 mkdir -p .claude/agents
 ```
 
+> Note: Copy the agents folder from starter into your project repo
+
 ### PM
 
 `.claude/agents/pm.md`:
@@ -320,15 +322,15 @@ mkdir -p .claude/agents
 ---
 name: pm
 description: Turns a backlog task into a precise spec with checkable acceptance criteria. Use before any implementation.
-tools: Read, Grep, Glob, Edit
+tools: Read, Grep, Glob, Edit, Write
 ---
 
 You're a Product Manager.
 
 You sharpen a task before anyone implements it.
 
-- Read the task in _docs/backlog.md
-- Read _docs/spec.md for wider context
+- Read the task in plans/backlog.md
+- Read plans/spec.md for wider context
 - Check what the task depends on, and assume that work exists
 - Rewrite the task with these four sections:
 
@@ -351,8 +353,6 @@ You sharpen a task before anyone implements it.
 An engineer who has never spoken to you should be able to implement
 this from the task alone.
 ```
-
-Look at `tools:`. `Read`, `Grep`, `Glob`. No `Edit`, no `Write`, no `Bash`. "Do not write any code" isn't an instruction it might drift from on turn forty. It can't.
 
 ### Engineer
 
@@ -486,7 +486,7 @@ The verdict vocabulary is GitHub's own, so it posts onto the PR unchanged.
 ### Run it
 
 ```
-Use the pm subagent to sharpen task 2 from _docs/backlog.md.
+Use the pm subagent to sharpen task 2 from plans/backlog.md.
 ```
 
 Read the output. Fix anything wrong, still cheap.
@@ -510,6 +510,8 @@ Watch for a `FAIL` or a `REQUEST CHANGES`. Either one is the return on this sect
 **Hooks** fire at lifecycle events: before a tool runs, after a file is edited, when the session tries to stop. They're shell scripts, not model decisions, so they don't drift, and they live in `.claude/`, so every worktree inherits them.
 
 Refer all the [lifecycle events here.](https://code.claude.com/docs/en/hooks)
+
+> Note: Copy the hooks folder from starter into your project repo
 
 ### Block the ad hoc install
 
@@ -614,7 +616,7 @@ You can also create a repo on the UI and link it the traditional way
 Model context Protocol, is a standard a spec on how to write a server that exposes tools to agents. 
 MCP gives claude code capabilities to interact with applications outside of user's system. Eg., Github, Google docs etc., 
 
-`_docs/backlog.md` works, but it's a file. Real work lives in an issue tracker.
+`plans/backlog.md` works, but it's a file. Real work lives in an issue tracker.
 
 ## Github MCP
 
@@ -637,12 +639,12 @@ Then:
 Authenticate when prompted, and look at the tools that appear.
 
 ```
-Read _docs/backlog.md and create a GitHub issue for every task that
+Read plans/backlog.md and create a GitHub issue for every task that
 isn't done. Put the "Depends on" line in the issue body, as issue
 numbers: "Depends on: #3, #5".
 ```
 
-Issues are the backlog from here on. `_docs/backlog.md` was the planning artifact and it stays in the repo, but state lives in the tracker now. A task is done when its issue closes, not when someone ticks a checkbox in a file.
+Issues are the backlog from here on. `plans/backlog.md` was the planning artifact and it stays in the repo, but state lives in the tracker now. A task is done when its issue closes, not when someone ticks a checkbox in a file.
 
 That matters for the next segment. Everything you build there reads issues, which means the same machinery that works through your plan also works through a bug someone else filed.
 
@@ -650,11 +652,6 @@ That matters for the next segment. Everything you build there reads issues, whic
 
 **Checkpoint:** `/mcp` shows GitHub connected, and your backlog exists as issues carrying their dependencies as `#N` references.
 
-## Your notes
-
-- Which acceptance criterion did the PM subagent catch that you would have skipped?
-- What did the QA subagent FAIL on, first time round?
-- Which hook actually fired during your session, and what did it stop?
 
 ---
 
@@ -694,7 +691,7 @@ git add -A && git commit -m "Add agents, rules, context"
 mkdir -p .claude/skills/task
 ```
 
-`.claude/skills/task/SKILL.md`:
+`.claude/skills/task/SKILL.md` or > Note: Copy the skills folder from starter into your project repo's `.claude`
 
 ```markdown
 ---
@@ -709,7 +706,7 @@ Take the issue number from the user's message. Call it N.
 1. Read issue N from GitHub. Check the "Depends on:" line. If any
    issue it depends on is still open, stop and tell me which.
    If the github MCP server is not connected, read task N from
-   _docs/backlog.md instead. Everything below is the same.
+   plans/backlog.md instead. Everything below is the same.
 2. Create the worktree:
    `git worktree add ../$(basename $PWD)-task-N -b task-N`
 3. All work for this task happens in that directory. Nothing is
@@ -858,13 +855,13 @@ Look at what accumulated:
   settings.json   # hook registration
   .mcp.json       # github
 CLAUDE.md         # always-on context
-_docs/
+plans/
   spec.md
   backlog.md      # with its dependency graph
+.claude-plugin/
+  plugin.json
+marketplace.json
 ```
-
-**That directory is the agentic OS.** Not a dashboard, not a product you install, the durable runtime your lifecycle executes on. ADLC is the process, this is the machine.
-
 `.claude/` travels with the branch, so every worktree inherits the same agents, rules, and gates. That's why parallel tasks produced consistent work instead of three different improvisations.
 
 The term gets used loosely: a repeatable plan → build → review → test → ship workflow where no step counts as done without evidence, and the gates sit where the agent cannot reach them. [`KbWen/agentic-os`](https://github.com/KbWen/agentic-os) is a reference implementation worth reading.
@@ -887,66 +884,22 @@ mkdir -p .claude-plugin
 }
 ```
 
-Push it, add it as a marketplace, and the next project starts with the whole lifecycle in place.
+`./marketplace.json`
+
+```json
+{
+  "name": "adlc-marketplace",
+  "owner": {
+    "name": "Bhavani"
+  },
+  "plugins": [
+    {
+      "name": "adlc",
+      "source": "./",
+      "description": "Spec-first lifecycle: PM/engineer/QA agents, worktree isolation, dependency-aware loop, dependency and test gates."
+    }
+  ]
+}
+```
 
 **Checkpoint:** your next repo is one command from everything you built today.
-
-## Your notes
-
-- What did QA or the reviewer catch that a passing test suite didn't?
-- What would have happened if either of them had write tools?
-- What could the agent have reached on your laptop if it hadn't been running sandboxed?
-- One thing from today you'll set up on your next real project before you write a line of code:
-
----
-
-## Fluency
-
-Worth knowing, no setup required:
-
-| | |
-|---|---|
-| `Esc Esc` | Rewind to an earlier point instead of untangling forward |
-| `/context` | See what is actually loaded |
-| `/compact` | Compress at a task boundary, not mid-task |
-| `#` | Write a rule to memory mid-session |
-| `/model` | Switch models without restarting |
-| `@path` | Pull a specific file into context |
-| `git worktree list` | What is still running, and what was left behind |
-
-## The trigger list
-
-Do not build all of this up front. Each piece has a moment where it earns its place:
-
-| When this happens | Add this |
-|---|---|
-| Claude gets a convention wrong twice | A line in `CLAUDE.md` |
-| That line only applies to some files | `.claude/rules/` with `paths:` |
-| You type the same prompt to start a task | A skill |
-| A side task floods your context | A subagent |
-| Nobody is reading the diff, only the test result | A reviewer agent that comments on the PR |
-| One agent agrees with the last agent's verdict | Run them in parallel on the same PR |
-| A failed task leaves mess on your branch | A worktree per task |
-| An agent runs unattended on input you didn't write | A sandbox, not just a worktree |
-| Two tasks have nothing to do with each other | Dependencies in the backlog, and a prompt to `/loop` that reads them |
-| The backlog and the issue tracker disagree | Pick the tracker, and point the loop at it |
-| You want it to happen **every** time | A hook |
-| A second repo needs the same setup | A plugin |
-
-The same triggers say when to update what exists. A repeated mistake is a `CLAUDE.md` edit, not a correction in chat.
-
-## Take-home checklist
-
-- [ ] Check your token cost before you touch anything, `ccusage` first, always
-- [ ] Let the Claude Code hook route your commands through `rtk`, and run `rtk discover` on your real history
-- [ ] Spec first on real projects, let Claude interrogate you
-- [ ] Put `Depends on:` in your backlog, and argue the agent down when it over-declares
-- [ ] Give your QA agent no write tools. Highest-value single change here.
-- [ ] Judge the PR, not the working directory, and run your judges in parallel so neither reads the other
-- [ ] Split `CLAUDE.md`: always-on stays, conditional moves to `.claude/rules/`
-- [ ] One task, one worktree, by default
-- [ ] Anything unattended reading input from strangers runs sandboxed
-- [ ] Make one "please don't" line from `CLAUDE.md` into a hook
-- [ ] Add a `Stop` hook before you run anything unattended
-- [ ] Package `.claude/` as a plugin before the next project
-</content>

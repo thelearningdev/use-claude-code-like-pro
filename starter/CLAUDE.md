@@ -1,7 +1,7 @@
 # splitwise-lite
 
-A CLI for splitting shared costs. See `_docs/spec.md` for what it is and
-`_docs/backlog.md` for what is left to build.
+A CLI for splitting shared costs. See `plans/spec.md` for what it is and
+`plans/backlog.md` for what is left to build.
 
 ## Commands
 

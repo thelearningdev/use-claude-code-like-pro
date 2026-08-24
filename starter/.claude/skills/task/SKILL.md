@@ -10,7 +10,7 @@ Take the issue number from the user's message. Call it N.
 1. Read issue N from GitHub. Check the "Depends on:" line. If any
    issue it depends on is still open, stop and tell me which.
    If the github MCP server is not connected, read task N from
-   _docs/backlog.md instead. Everything below is the same.
+   plans/backlog.md instead. Everything below is the same.
 2. Create the worktree:
    `git worktree add ../$(basename $PWD)-task-N -b task-N`
 3. All work for this task happens in that directory. Nothing is

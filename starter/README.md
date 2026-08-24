@@ -18,8 +18,8 @@ Two passing tests and a version number means you're ready.
 
 | | |
 |---|---|
-| `_docs/spec.md` | What this app is, written before any code |
-| `_docs/backlog.md` | Five tasks with their dependencies. Task 1 is done |
+| `plans/spec.md` | What this app is, written before any code |
+| `plans/backlog.md` | Five tasks with their dependencies. Task 1 is done |
 | `CLAUDE.md` | Always-on context, loaded every session |
 | `.claude/rules/testing.md` | Path-scoped. Loads only when touching tests |
 | `splitwise/`, `tests/` | Task 1, green |

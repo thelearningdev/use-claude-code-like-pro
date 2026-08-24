@@ -1,0 +1,5 @@
+{
+  "name": "adlc",
+  "version": "0.1.0",
+  "description": "Spec-first lifecycle: PM/engineer/QA agents, worktree isolation, dependency-aware loop, dependency and test gates."
+}

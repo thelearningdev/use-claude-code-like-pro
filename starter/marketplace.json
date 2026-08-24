@@ -1,0 +1,13 @@
+{
+  "name": "adlc-marketplace",
+  "owner": {
+    "name": "Bhavani"
+  },
+  "plugins": [
+    {
+      "name": "adlc",
+      "source": "./",
+      "description": "Spec-first lifecycle: PM/engineer/QA agents, worktree isolation, dependency-aware loop, dependency and test gates."
+    }
+  ]
+}

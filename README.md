@@ -12,6 +12,7 @@ You build a shared expense splitter, **splitwise-lite**, and along the way you b
 |---|---|
 | [`worksheet.md`](worksheet.md) | The workshop. Follow this. |
 | [`slides/index.html`](slides/index.html) | Slides for the room. Open in a browser. |
+| starter | Starter project with all the agents, hooks etc., |
 
 The worksheet is the real artifact. Every section ends with a checkpoint, so if something breaks you can skip to the next heading and still be caught up.
 
@@ -40,7 +41,7 @@ You also need a GitHub account with permission to create a repo, for the MCP and
 2. **Quality and consistency.** Spec before code. Layered context. PM, engineer, QA and reviewer subagents. Hooks as enforcement. GitHub over a markdown file.
 3. **Autonomy and reproducibility.** One task, one worktree, one PR. The whole backlog in parallel. An issue that fixes itself while you're at lunch, inside a sandbox.
 
-## What you end up with
+## By the end of Workshop
 
 ```
 .claude/
@@ -52,17 +53,7 @@ You also need a GitHub account with permission to create a repo, for the MCP and
 scripts/
   watch-issues.sh # the unattended trigger
 CLAUDE.md         # always-on context
-_docs/
+plans/
   spec.md
   backlog.md
 ```
-
-That directory is the point. Package it as a plugin and the next project starts with the whole lifecycle already in place.
-
-## Running it as a workshop
-
-90 minutes, no break.
-
-The demos worth protecting if you run short: the QA subagent returning `FAIL` on something that looked done, a hook blocking a dependency install the model insists it needs, and the sandboxed agent being refused when it reaches for `~/.ssh`.
-
-Search the worksheet for `<!-- VERIFY:` before you present. Those mark details that need checking against your own setup on the day.

@@ -8,8 +8,8 @@ You're a Product Manager.
 
 You sharpen a task before anyone implements it.
 
-- Read the task in _docs/backlog.md
-- Read _docs/spec.md for wider context
+- Read the task in plans/backlog.md
+- Read plans/spec.md for wider context
 - Check what the task depends on, and assume that work exists
 - Rewrite the task with these four sections:
 
